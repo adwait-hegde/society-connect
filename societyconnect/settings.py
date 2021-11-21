@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django_celery_results',
     'django_celery_beat',
     'ckeditor',
+    'crispy_forms',
 
 ]
 
@@ -154,8 +155,8 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_USE_TLS = True
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'adwaitahegde@gmail.com' #os.environ.get('djemail')
-EMAIL_HOST_PASSWORD =  '' #os.environ.get('djpassword')
+EMAIL_HOST_USER = os.environ.get('djemail')
+EMAIL_HOST_PASSWORD =  os.environ.get('djpassword')
 DEFAULT_FROM_EMAIL = 'Society Connect <noreply.adwait@gmail.com>'
 
 

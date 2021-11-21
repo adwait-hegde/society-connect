@@ -40,6 +40,12 @@ class SocietyMember(models.Model):
     def get_dues(self):
         return self.dues
 
+    def get_dues_rs(self):
+        return int(self.dues)
+
+    def get_dues_ps(self):
+        return int((self.dues - int(self.dues))*100)
+
 
 ROLE_CHOICES = (
     ('SEC', 'Secretary'),
@@ -87,8 +93,8 @@ class Watchman(models.Model):
 class MaintenanceBill(models.Model):
     bill_id = models.AutoField(primary_key=True)
     owner = models.ForeignKey(SocietyMember,on_delete=models.SET_NULL,null=True)
-    total = models.FloatField()
-    date = models.DateField()
+    total = models.FloatField(default=0)
+    date = models.DateField(auto_now=True)
 
     def __str__(self):
         return str(self.bill_id) + " " + str(self.date) + " " + str(self.owner)
@@ -135,9 +141,10 @@ class Transaction(models.Model):
     status = models.BooleanField()
     mode = models.CharField(max_length=6, choices=TNX_CHOICES)
     detail = models.CharField(max_length=25)
+    date = models.DateTimeField(auto_now=True)
 
-
-    # def make_transaction(self, ):
+    def make_transaction(self):
+        self.save()
 
 
 class NoticeBoard(models.Model):
