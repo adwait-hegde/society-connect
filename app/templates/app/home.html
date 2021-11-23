@@ -4,7 +4,8 @@
    <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1">
-      <title>Bootstrap Landing Page by Developer Drive</title>
+      <title>Home | Society Connect </title>
+        <link rel="shortcut icon" href="{% static 'assets/images/favicon.png' %}" />
    
       <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
       <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
@@ -19,11 +20,6 @@
                 background-color: #c60063;
                 border-color: #c60063;
             }
-            .btn-secondary {
-                background-color: transparent;
-                border-color: #c60063;
-                color: #c60063;
-            }
             #contact {
                 background: url("https://www.zawya.com/images/cia/zAmp/180709211139LUZT.jpg") no-repeat center;
             }
@@ -34,9 +30,9 @@
    <body>
    
        <!-- Here comes the rest of the code -->
-       <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+       <nav class="navbar navbar-expand-lg navbar-light fixed-top"  style="background-color: #e3f2fd;">
             <div class="container">
-                <a class="navbar-brand" href="#">Hello User</a>
+                <a class="p-3" href="/"><img src="{% static 'assets/images/logo.png' %}" alt="logo"  width="225px"/></a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" 
                 data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" 
                 aria-expanded="false" aria-label="Toggle navigation">
@@ -66,7 +62,11 @@
                 <h1 class="display-3 font-weight-normal"> Welcome to Society Connect</h1>
                 <p class="lead pb-4 font-weight-normal">We are happy to see you here, login to view dashboard.</p>
                 <br>
-                <p><a href="/login" class="btn btn-primary btn-lg" role="button">Log In</a></p>
+                {% if request.user.is_authenticated %}
+                    <p><a href="/dashboard" class="btn btn-primary btn-lg" role="button">Dashboard</a></p>
+                {% else %}
+                    <p><a href="/login" class="btn btn-primary btn-lg" role="button">Log In</a></p>
+                {% endif %}
             </div>
             <br>
         </header>
@@ -82,9 +82,6 @@
                         <p class="card-text">Deliver the best user experience 
                         with our carefully designed responsive websites and applications!</p>
                      </div>
-                     <div class="card-footer py-4">
-                        <a href="#" class="btn btn-secondary">See portfolio &raquo;</a>
-                     </div>
                   </div>
                </div>
                
@@ -96,9 +93,6 @@
                            <p class="card-text">You need software that works on every device. 
                            Leverage the latest technologies and the most powerful tools!</p>
                      </div>
-                     <div class="card-footer py-4">
-                        <a href="#" class="btn btn-secondary">See projects &raquo;</a>
-                     </div>
                   </div>
                </div>
                
@@ -109,9 +103,6 @@
                         <h4 class="card-title">Analytics</h4>
                         <p class="card-text">Consult our experts to set up proper goals and 
                         find the best stack for your next application!</p>
-                     </div>
-                     <div class="card-footer py-4">
-                        <a href="#" class="btn btn-secondary">See testimonials &raquo;</a>
                      </div>
                   </div>
                </div>

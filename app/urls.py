@@ -22,6 +22,10 @@ urlpatterns = [
     path('maintenancebill/<int:pk>/', views.maintenancebill_one, name='maintenancebill_one'),
 
 
+    path('memberdash/', views.memberdash, name='memberdash'),
+    
+    path('addnotice/', views.addnotice, name='addnotice'),
+    # path('success/', views.success, name='success'),
     # path('success/', views.success, name='success'),
 
     
@@ -30,7 +34,7 @@ urlpatterns = [
 
 
         path('reset_password/',
-     auth_views.PasswordResetView.as_view(template_name="app/password_reset.html"),
+     auth_views.PasswordResetView.as_view(template_name="app/password_reset.html", html_email_template_name="app/mail_passwordreset.html"),
      name="reset_password"),
 
     path('reset_password_sent/', 

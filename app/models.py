@@ -145,11 +145,12 @@ class Transaction(models.Model):
 
     def make_transaction(self):
         self.save()
+        return self.tid
 
 
 class NoticeBoard(models.Model):
     added_by = models.ForeignKey(CommitteeMember, on_delete=models.SET_NULL,null=True)
-    date_added = models.DateTimeField(auto_now=True)
+    date_added = models.DateTimeField()
     last_edited = models.DateTimeField(auto_now_add=True)
     is_edited = models.BooleanField(default=False)
     notice = RichTextField(blank=True, null=True)

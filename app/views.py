@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 # from django.http import HttpResponse
 from django.shortcuts import redirect, render
-from .tasks import send_mail_func
+from .tasks import *
 from .forms import NoticeBoardForm
 import razorpay
 from django.views.decorators.csrf import csrf_exempt
@@ -45,22 +45,62 @@ def logout_view(request):
 @login_required
 def dashboard(request):
     user = request.user
-    # notices = NoticeBoard.objects.all()
-    # last_notices = notices.filter(date_added__gte=datetime.now() + relativedelta(months = -1))
+    notices = NoticeBoard.objects.all()
+    notice = notices.last()
+    noticecount = notices.count()
+    last_notices = notices.filter(date_added__gte=datetime.now() + relativedelta(months = -1)).count()
+    new_notices = notices.filter(date_added__gte=datetime.now() + relativedelta(days = -7)).count()
     try:
         sm = SocietyMember.objects.get(user=user)
         print("sm")
+        
         if sm.is_owner:
-            return render(request, 'app/owner.html', {"sm": sm })
+            txns = Transaction.objects.filter(user=sm)[::-1][:6]
+            bills = MaintenanceBill.objects.filter(owner=sm).reverse()[::-1][:6]
+            commember = CommitteeMember.objects.filter(user=user).count() != 0
+            return render(request, 'app/owner.html', {"sm": sm, 'notice':notice,'txns':txns, 'bills':bills,'noticecount':noticecount, 'last_notices':last_notices, 'new_notices':new_notices, 'commember':commember })
         else:
-            return render(request, 'app/tenant.html')
+            return render(request, 'app/tenant.html', {"sm": sm, 'notice':notice, 'noticecount':noticecount, 'last_notices':last_notices, 'new_notices':new_notices })
     except:
-        try:
-            sm = CommitteeMember.objects.get(user=user)
-            print("cmmmm")
-        except:
-            print("watchman")
-    return render(request, 'app/member.html')
+        return redirect('/')
+        # try:
+        #     sm = CommitteeMember.objects.get(user=user)
+        #     print("cmmmm")
+        # except:
+        #     print("watchman")
+    # return render(request, 'app/member.html')
+
+
+@login_required
+def memberdash(request):
+    try:
+        skm = CommitteeMember.objects.get(user=request.user)
+    except:
+        return redirect('/dashboard/')
+
+        
+    smem = SocietyMember.objects.filter(is_owner=True, user__is_active=True)
+    
+    if request.method=="POST":
+        # print(request)
+        userid = request.POST.get('userselect')
+        mode = request.POST.get('gridRadios')
+        details = request.POST.get('details')
+        money = float(request.POST.get('money'))
+        success = request.POST.get('success')=='on'
+        # print(userid, mode,details,money,success)
+        sm = SocietyMember.objects.get(pk=userid)
+        # print()
+        # print(money,detail)
+        txn = Transaction(user=sm, amount=money, status=success, mode=mode, detail=details)
+        tid = txn.make_transaction()
+        if txn.status:
+            sm.dues -= money
+            sm.save()
+        send_mail_txn_status.delay(tid, sm.user.pk)
+
+    return render(request, 'app/member.html', {'smem':smem})
+    
 
 
 @login_required
@@ -98,9 +138,10 @@ def success(request):
         print()
         print(money,detail)
         txn = Transaction(user=sm, amount=money, status=True, mode='ONLINE', detail=detail)
-        txn.make_transaction()
+        tid = txn.make_transaction()
         sm.dues = 0
-        sm.save()    
+        sm.save()
+        send_mail_txn_status.delay(tid, request.user.pk)
         # return redirect('/success')
         return render(request, "app/success.html")
     return redirect('/paymentgateway/')
@@ -115,17 +156,53 @@ def transactions(request):
         try:
             sm = SocietyMember.objects.get(user=request.user)
             if sm.is_owner:
-                txns = Transaction.objects.filter(user=sm)
+                txns = Transaction.objects.filter(user=sm)[::-1]
                 return render(request, 'app/transactions.html', {"txns":txns})
             else:
                 return redirect('/dashboard/')
         except:
             return redirect('/dashboard/')
 
+
+@login_required
+def addnotice(request):
+    if request.method == "POST":
+        try:
+            cm = CommitteeMember.objects.get(user=request.user)
+        except:
+            return redirect("/dashboard/")
+
+        form = NoticeBoardForm(request.POST)
+        if form.is_valid():
+            notice = form.cleaned_data['notice']
+            print(notice)
+            noticebrd = NoticeBoard(added_by=cm, notice=notice, date_added=datetime.now())
+            noticebrd.save()
+            
+            notibrd = NoticeBoard.objects.all().last()
+            send_mail_notice.delay(notibrd.pk)
+            # send_mail_notice.delay(notice)
+            # send_mail_func.delay()
+            # SEND EMAIL send_mail_func.delay()
+            # print(" Bill ceated for: ",sm)
+            # send_mail_func.delay()
+            return redirect('/dashboard/')
+
+    if request.method == "GET":
+        try:
+            sm = CommitteeMember.objects.get(user=request.user)
+        except:
+            return redirect("/dashboard/")
+        # smem = SocietyMember.objects.filter(is_owner=True, user__is_active=True)
+        form = NoticeBoardForm()
+        return render(request, 'app/addnotice.html', {'form':form})
+
+
+
 @login_required
 def notice(request):
     if request.method == "GET":
-        notices = NoticeBoard.objects.all()
+        notices = NoticeBoard.objects.all().order_by("date_added").reverse()
         return render(request, 'app/notice.html', {'notices':notices})
 
 
@@ -135,9 +212,14 @@ def notice_one(request, pk):
         notice = NoticeBoard.objects.get(pk=pk)
         return render(request, 'app/noticesingle.html', {'notice':notice})
 
-
+# @login_required
 def addbill(request):
     if request.method == "POST":
+        try:
+            sm = CommitteeMember.objects.get(user=request.user)
+        except:
+            return redirect("/dashboard/")
+    
         billdet = request.POST.get('billdet')
         details = json.loads(billdet)
         smem = SocietyMember.objects.filter(is_owner=True, user__is_active=True)
@@ -158,10 +240,17 @@ def addbill(request):
             sm.dues += total
             sm.save()
             bill.save()
-            print(" Bill ceated for: ",sm)
-        return redirect('/dashboard/')
+            # send_mail_func.delay()
+            # SEND EMAIL send_mail_func.delay()
+            # print(" Bill ceated for: ",sm)
+            send_mail_func.delay()
+            return redirect('/dashboard/')
 
     if request.method == "GET":
+        try:
+            cm = CommitteeMember.objects.get(user=request.user)
+        except:
+            return redirect("/dashboard/")
         smem = SocietyMember.objects.filter(is_owner=True, user__is_active=True)
         return render(request, 'app/addbilldetail.html', {'sm':smem})
 
@@ -195,9 +284,6 @@ def maintenancebill_one(request, pk):
                 dets = BillDetail.objects.filter(bill=bill)
                 
                 return render(request, 'app/maintenancebillsingle.html', {"bill":bill, "dets":dets})
-                print("elanan")
-                print("elanan")
-                print("elanan")
             else:
                 return redirect('/dashboard/')
         except:

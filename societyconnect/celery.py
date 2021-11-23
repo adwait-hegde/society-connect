@@ -16,11 +16,10 @@ app.config_from_object(settings, namespace='CELERY')
 
 # Celery Beat Settings
 app.conf.beat_schedule = {
-    # 'send-mail-every-day-at-8': {
-    #     'task': 'send_mail_app.tasks.send_mail_func',
-    #     'schedule': crontab(hour=0, minute=46, day_of_month=19, month_of_year = 6),
-    #     #'args': (2,)
-    # }
+    'send-mail-every-month-at-24': {
+        'task': 'app.tasks.send_mail_reminder',
+        'schedule': crontab(hour=23, minute=20, day_of_month=23),
+    }
     
 }
 
