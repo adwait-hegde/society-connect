@@ -29,6 +29,7 @@ def signin(request):
         print(username,password)
         user=authenticate(username=username,password=password)
         if user is not None:
+            messages.success(request,"Login Successful! Welcome to your Dashboard...")
             login(request,user)
             return redirect('/dashboard/')
         else:
@@ -58,7 +59,7 @@ def dashboard(request):
             txns = Transaction.objects.filter(user=sm)[::-1][:6]
             bills = MaintenanceBill.objects.filter(owner=sm).reverse()[::-1][:6]
             commember = CommitteeMember.objects.filter(user=user).count() != 0
-            return render(request, 'app/owner.html', {"sm": sm, 'notice':notice,'txns':txns, 'bills':bills,'noticecount':noticecount, 'last_notices':last_notices, 'new_notices':new_notices, 'commember':commember })
+            return render(request, 'app/owner2.html', {"sm": sm, 'notice':notice,'txns':txns, 'bills':bills,'noticecount':noticecount, 'last_notices':last_notices, 'new_notices':new_notices, 'commember':commember })
         else:
             return render(request, 'app/tenant.html', {"sm": sm, 'notice':notice, 'noticecount':noticecount, 'last_notices':last_notices, 'new_notices':new_notices })
     except:

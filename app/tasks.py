@@ -49,7 +49,7 @@ def send_mail_func(self):
         message = EmailMessage(subject, html_message, from_email, [to_email])
         message.content_subtype = 'html' # this is required because there is no plain text email message
         message.send()
-        break
+        # break
     return "Done"
 
 
@@ -86,7 +86,7 @@ def send_mail_notice(self, pk):
     for user in users:
         context = {'user':user, 'notice':notice}
         send_mail(subject="New Notice added to the Notice Board", html_template="app/mail_notice.html",user=user, context=context)
-        break
+        # break
     return "Done"
 
 

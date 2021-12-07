@@ -103,7 +103,9 @@ class MaintenanceBill(models.Model):
     def get_total(self):
         return self.total
 
-    # def remove_billdetail(self,)
+    def remove_billdetail(self):
+        self.delete()
+
 
 
 
@@ -154,6 +156,22 @@ class NoticeBoard(models.Model):
     last_edited = models.DateTimeField(auto_now_add=True)
     is_edited = models.BooleanField(default=False)
     notice = RichTextField(blank=True, null=True)
+
+    def add_notice(self, cm, notice):
+        noticebrd = NoticeBoard(added_by=cm, notice=notice, date_added=datetime.now())
+        noticebrd.save()
+        return noticebrd.pk
+    
+    def edit_notice(self, notice):
+        self.notice=notice
+        self.is_edited=True
+
+    def display_notice(self):
+        return self.notice
+    
+    def delete_notice(self):
+        self.delete()
+
 
 '''
 class OninePoll(models.Model):
