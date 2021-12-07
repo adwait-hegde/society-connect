@@ -54,6 +54,13 @@
             <input type="text" id="password" class="fadeIn third" name="password" placeholder="password">
             <input type="submit" class="fadeIn fourth" value="Log In">
         </form>
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}" role="alert">
+            {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
 
         <!-- Remind Passowrd -->
         <div id="formFooter">

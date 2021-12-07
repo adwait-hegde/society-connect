@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http.response import Http404
 # from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from .tasks import *
@@ -19,21 +20,24 @@ import json
 
 # Create your views here.
 def home(request):
-    return render(request, 'app/home.html')
+    if request.method=="GET":
+        return render(request, 'app/home.html')
+    raise Http404('No such request')
 
-
+@csrf_exempt
 def signin(request):
     if request.method=="POST":
         username=request.POST.get('username')
         password=request.POST.get('password')
-        print(username,password)
         user=authenticate(username=username,password=password)
         if user is not None:
             messages.success(request,"Login Successful! Welcome to your Dashboard...")
             login(request,user)
+            print("Login Success!")
             return redirect('/dashboard/')
         else:
             messages.error(request,"Wrong credentials,Please try again !")
+            print("Wrong credentials,Please try again !")
             return redirect('/login/')
     if request.method == 'GET':
         return render(request, 'app/login.html')

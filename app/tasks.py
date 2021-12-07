@@ -37,20 +37,20 @@ def send_mail(subject, html_template, user, context):
 @shared_task(bind=True)
 def send_mail_func(self):
     users = get_user_model().objects.all()
-    #timezone.localtime(users.date_time) + timedelta(days=2)
-    for user in users:
-        # import html message.html file
-        subject = "Society Connect Testing"
-        html_template = 'app/mail_template.html'
-        to_email = user.email
-        from_email=settings.DEFAULT_FROM_EMAIL
-        html_message = render_to_string(html_template, { 'user': user, })
+    try:
+        for user in users:
+            subject = "Society Connect Testing"
+            html_template = 'app/mail_template.html'
+            to_email = user.email
+            from_email=settings.DEFAULT_FROM_EMAIL
+            html_message = render_to_string(html_template, { 'user': user, })
 
-        message = EmailMessage(subject, html_message, from_email, [to_email])
-        message.content_subtype = 'html' # this is required because there is no plain text email message
-        message.send()
-        # break
-    return "Done"
+            message = EmailMessage(subject, html_message, from_email, [to_email])
+            message.content_subtype = 'html' # this is required because there is no plain text email message
+            message.send()
+        return True
+    except:
+        return False
 
 
 @shared_task(bind=True)
