@@ -1,14 +1,18 @@
 
 # Society Connect
-#### Housing Society management Software
-All of the society's data is currently stored in physical files, which are vulnerable to damage, loss, and manipulation by anyone. The management of information and effective member communication are challenges for many modern societies. As a result, this data needs to be digitalized. So,  we want to close this gap with the help of our smart web-based society management software, SOCIETY CONNECT (inspired from societyconnect.in)
+
+This project was a part of Software Engineering (CS302)  course where I was able to learn various aspects of SDLC and documentations required such as creating Software Requirements Specification,  UML diagram -Use Case, Class diagram, Interaction Diagrams, Data flow diagram, Work Breakdown Structure, Risk Mitigation, Monitoring and Management Plan (RMMM) and Unit Testing.
+
+#### Housing Society Management Software
+All of the society's data is currently stored in physical files, which are vulnerable to damage, loss, and manipulation by anyone. The management of information and effective member communication are challenges for many modern societies. As a result, this data needs to be digitalized. So,  we want to close this gap with the help of our smart web-based Society Management Software, Society Connect (inspired from societyconnect.in)
 
 ## Goal
-With the help of Society Connect, a Smart Society Management Software, we hope to thoroughly address the issues that complex encounter in the real world and digitalize those services. To maintain excellent communication among society members, it offers online tools like a notice board, maintenance management, a virtual complaint box, online polls, visitor management, and other features. 
+With the help of Society Connect, a Smart Society Management Software, we hope to thoroughly address the issues that complex encounter in the real world and digitalize those services. To maintain excellent communication among society members, it offers online tools like a Notice Board, Maintenance Management, a Virtual Complaint Box, Online Polls, Visitor Management, and other features. 
 
+**Tech Stack**: Django, Django Celery, Celery Beat using Redis server. HTML, Bootstrap, JavaScript
 
 ## Screenshots
-These are the screenshots of some important pages
+These are some screenshots of the important pages
 
 ### Landing Page:
 
@@ -81,11 +85,6 @@ These are the screenshots of some important pages
 ### Password Reset Email
 ##### Link to reset user's password sent to the user via email
 ![Password Reset Email](images/pr.png)
-
-
-### Class Diagram
-![Class Diagram](images/class_diagram.png)
-
 
 
 
